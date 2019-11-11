@@ -98,7 +98,12 @@ public class XmlBeanDefinitionReaderTests {
 		reader.loadBeanDefinitions(resource);
 		testBeanDefinitions(registry);
 	}
-
+	/**
+	 * @Description  解析XML配置文件成对应的BeanDefinition单元测试
+	 * XML Resource => XML Document => Bean Definition
+	 * @Author yangsj
+	 * @Date 2019-11-10 17:11
+	 **/
 	@Test
 	public void withFreshInputStream() {
 		SimpleBeanDefinitionRegistry registry = new SimpleBeanDefinitionRegistry();
