@@ -106,8 +106,11 @@ public class XmlBeanDefinitionReaderTests {
 	 **/
 	@Test
 	public void withFreshInputStream() {
+		//获取 BeanDefinitionRegistry
 		SimpleBeanDefinitionRegistry registry = new SimpleBeanDefinitionRegistry();
+		//获取资源
 		Resource resource = new ClassPathResource("test.xml", getClass());
+		//根据 BeanDefinitionRegistry 创建一个对象解析器
 		new XmlBeanDefinitionReader(registry).loadBeanDefinitions(resource);
 		testBeanDefinitions(registry);
 	}
