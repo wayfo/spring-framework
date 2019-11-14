@@ -16,18 +16,19 @@
 
 package org.springframework.beans.factory.xml;
 
+import java.io.IOException;
 import java.util.Arrays;
 
 import org.junit.jupiter.api.Test;
+import org.springframework.core.io.*;
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
+import org.springframework.core.io.support.ResourcePatternResolver;
 import org.xml.sax.InputSource;
 
 import org.springframework.beans.factory.BeanDefinitionStoreException;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.beans.factory.support.SimpleBeanDefinitionRegistry;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.InputStreamResource;
-import org.springframework.core.io.Resource;
 import org.springframework.tests.sample.beans.TestBean;
 import org.springframework.util.ObjectUtils;
 
@@ -130,7 +131,56 @@ public class XmlBeanDefinitionReaderTests {
 		assertThat(ObjectUtils.containsElement(aliases, "myalias")).isTrue();
 		assertThat(ObjectUtils.containsElement(aliases, "youralias")).isTrue();
 	}
+	/**
+	 * @Description ResourceLoader 资源类型校验测试
+	 * @Author yangsj
+	 * @Date 2019-11-14 21:44
+	 **/
+	@Test
+	public void DefaultResourceLoadertest(){
+		ResourceLoader resourceLoader = new DefaultResourceLoader();
 
+		Resource fileResource1 = resourceLoader.getResource("D:/Users/chenming673/Documents/spark.txt");
+		System.out.println("fileResource1 is FileSystemResource:" + (fileResource1 instanceof FileSystemResource));
+
+		Resource fileResource2 = resourceLoader.getResource("/Users/chenming673/Documents/spark.txt");
+		System.out.println("fileResource2 is ClassPathResource:" + (fileResource2 instanceof ClassPathResource));
+
+		Resource urlResource1 = resourceLoader.getResource("file:/Users/chenming673/Documents/spark.txt");
+		System.out.println("urlResource1 is UrlResource:" + (urlResource1 instanceof UrlResource));
+
+		Resource urlResource2 = resourceLoader.getResource("http://www.baidu.com");
+		System.out.println("urlResource1 is urlResource:" + (urlResource2 instanceof  UrlResource));
+
+		FileSystemResourceLoader fileSystemResourceLoader = new FileSystemResourceLoader();
+
+		Resource fileResource3 = fileSystemResourceLoader.getResource("D:/Users/chenming673/Documents/spark.txt");
+
+		System.out.println("fileResource3 is FileSystemResource : " + (fileResource3 instanceof FileSystemResource));
+	}
+
+	/**
+	 * @Description ResourcePatternResolver 加载多个资源
+	 * @Author yangsj
+	 * @Date 2019-11-14 21:45
+	 **/
+	@Test
+	public void ResourcePatternResolverTest() throws IOException {
+		ResourcePatternResolver resourcePatternResolver = new PathMatchingResourcePatternResolver();
+		//classpath: 表示加载当前类路径中所有匹配的资源
+		Resource[] resources = resourcePatternResolver.getResources("classpath:/bulid/classes/java/test/org/springframework/beans/");
+		for (Resource resource: resources) {
+			System.out.println(resource.getFilename());
+		}
+		System.out.println("---------------------------");
+		//classpath*: 表示加载类路径中所有匹配的资源
+		resources = resourcePatternResolver.getResources("classpath*:/");
+		for(Resource resource : resources){
+			System.out.println(resource.getURL().getPath()); //文件绝对路径
+		}
+
+
+	}
 	@Test
 	public void dtdValidationAutodetect() {
 		doTestValidation("validateWithDtd.xml");
