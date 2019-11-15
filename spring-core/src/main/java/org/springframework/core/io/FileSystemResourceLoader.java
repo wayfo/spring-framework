@@ -16,7 +16,11 @@
 
 package org.springframework.core.io;
 
-/**
+/** 其实 DefaultResourceLoader 对#getResourceByPath(String) 方法处理其实不是很恰当
+ *  DefaultResourceLoader 无法确切的返回 filepath 路径 例如（"D:/log.txt"）的资源，这时就需要用到 FileSystemResourceLoader
+ *  它继承 DefaultResourceLoader ，且覆写了 #getResourceByPath(String) 方法，
+ *  使之从文件系统加载资源并以 FileSystemResource 类型返回，这样我们就可以得到想要的资源类型。
+ *
  * {@link ResourceLoader} implementation that resolves plain paths as
  * file system resources rather than as class path resources
  * (the latter is {@link DefaultResourceLoader}'s default strategy).
@@ -48,9 +52,11 @@ public class FileSystemResourceLoader extends DefaultResourceLoader {
 	 */
 	@Override
 	protected Resource getResourceByPath(String path) {
+		// 截取掉首 /
 		if (path.startsWith("/")) {
 			path = path.substring(1);
 		}
+		// 创建 FileSystemContextResource 类型的资源
 		return new FileSystemContextResource(path);
 	}
 

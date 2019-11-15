@@ -19,7 +19,8 @@ package org.springframework.core.io;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
-/**
+/** 覆写 DefaultResourceLoader#getResourceByPath(String path) 方法，
+ *  并返回其对应的 ClassRelativeContextResource 的资源类型
  * {@link ResourceLoader} implementation that interprets plain resource paths
  * as relative to a given {@code java.lang.Class}.
  *
