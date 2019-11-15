@@ -302,7 +302,7 @@ public class PathMatchingResourcePatternResolver implements ResourcePatternResol
 		Assert.notNull(locationPattern, "Location pattern must not be null");
 		// 以 "classpath*:" 开头
 		if (locationPattern.startsWith(CLASSPATH_ALL_URL_PREFIX)) {
-			// 路径包含通配符?
+			// 路径包含通配符
 			// a class path resource (multiple resources for same name possible)
 			if (getPathMatcher().isPattern(locationPattern.substring(CLASSPATH_ALL_URL_PREFIX.length()))) {
 				// a class path resource pattern
@@ -520,7 +520,7 @@ public class PathMatchingResourcePatternResolver implements ResourcePatternResol
 	 * Find all resources that match the given location pattern via the
 	 * Ant-style PathMatcher. Supports resources in jar files and zip files
 	 * and in the file system.
-	 * @param locationPattern the location pattern to match
+	 * @param locationPattern the location pattern to match 带协议名和通配符的路径例如：classpath:org/springframework/**\/*.xml
 	 * @return the result as Resource array
 	 * @throws IOException in case of I/O errors
 	 * @see #doFindPathMatchingJarResources
@@ -528,8 +528,9 @@ public class PathMatchingResourcePatternResolver implements ResourcePatternResol
 	 * @see org.springframework.util.PathMatcher
 	 */
 	protected Resource[] findPathMatchingResources(String locationPattern) throws IOException {
-		// 确定根路径、子路径
+		// 确定根路径、子路径 例：classpath:org/springframework/
 		String rootDirPath = determineRootDir(locationPattern);
+		//截取统配符 例：**/*.xml
 		String subPattern = locationPattern.substring(rootDirPath.length());
 		// 获取根路径下的资源
 		Resource[] rootDirResources = getResources(rootDirPath);
@@ -537,6 +538,8 @@ public class PathMatchingResourcePatternResolver implements ResourcePatternResol
 		// 遍历，迭代根路径下的资源
 		for (Resource rootDirResource : rootDirResources) {
 			rootDirResource = resolveRootDirResource(rootDirResource);
+			//获取根路径的url
+			//例：file:/D:/workspace/MyWork/examples/base/target/classes/org/springframework/
 			URL rootDirUrl = rootDirResource.getURL();
 			// bundle 资源类型
 			if (equinoxResolveMethod != null && rootDirUrl.getProtocol().startsWith("bundle")) {
@@ -553,7 +556,7 @@ public class PathMatchingResourcePatternResolver implements ResourcePatternResol
 			// jar 资源类型
 			else if (ResourceUtils.isJarURL(rootDirUrl) || isJarResource(rootDirResource)) {
 				result.addAll(doFindPathMatchingJarResources(rootDirResource, rootDirUrl, subPattern));
-			}// 其它资源类型
+			}// 其它资源类型 例： file 类型资源进入下面的方法处理
 			else {
 				result.addAll(doFindPathMatchingFileResources(rootDirResource, subPattern));
 			}
@@ -735,8 +738,8 @@ public class PathMatchingResourcePatternResolver implements ResourcePatternResol
 	/**
 	 * Find all resources in the file system that match the given location pattern
 	 * via the Ant-style PathMatcher.
-	 * @param rootDirResource the root directory as Resource
-	 * @param subPattern the sub pattern to match (below the root directory)
+	 * @param rootDirResource the root directory as Resource 根路径资源 例：class path resource [org/springframework/]
+	 * @param subPattern the sub pattern to match (below the root directory) 通配符子路径 例：**\/*.xml
 	 * @return a mutable Set of matching Resource instances
 	 * @throws IOException in case of I/O errors
 	 * @see #retrieveMatchingFiles
@@ -747,6 +750,8 @@ public class PathMatchingResourcePatternResolver implements ResourcePatternResol
 
 		File rootDir;
 		try {
+			//获取根路径文件的绝对路径
+			//例：D:\workspace\MyWork\examples\base\target\classes\org\springframework
 			rootDir = rootDirResource.getFile().getAbsoluteFile();
 		}
 		catch (FileNotFoundException ex) {
@@ -762,6 +767,7 @@ public class PathMatchingResourcePatternResolver implements ResourcePatternResol
 			}
 			return Collections.emptySet();
 		}
+		//获取匹配的路径资源，并返回
 		return doFindMatchingFileSystemResources(rootDir, subPattern);
 	}
 
@@ -769,7 +775,9 @@ public class PathMatchingResourcePatternResolver implements ResourcePatternResol
 	 * Find all resources in the file system that match the given location pattern
 	 * via the Ant-style PathMatcher.
 	 * @param rootDir the root directory in the file system
+	 *                   根路径的绝对路径 例：D:\workspace\MyWork\examples\base\target\classes\org\springframework
 	 * @param subPattern the sub pattern to match (below the root directory)
+	 *                   通配符子路径 例：**\/*.xml
 	 * @return a mutable Set of matching Resource instances
 	 * @throws IOException in case of I/O errors
 	 * @see #retrieveMatchingFiles
@@ -779,6 +787,7 @@ public class PathMatchingResourcePatternResolver implements ResourcePatternResol
 		if (logger.isTraceEnabled()) {
 			logger.trace("Looking for matching resources in directory tree [" + rootDir.getPath() + "]");
 		}
+		//获取所有和通配符匹配的路径文件
 		Set<File> matchingFiles = retrieveMatchingFiles(rootDir, subPattern);
 		Set<Resource> result = new LinkedHashSet<>(matchingFiles.size());
 		for (File file : matchingFiles) {
@@ -791,39 +800,46 @@ public class PathMatchingResourcePatternResolver implements ResourcePatternResol
 	 * Retrieve files that match the given path pattern,
 	 * checking the given directory and its subdirectories.
 	 * @param rootDir the directory to start from
+	 *                根路径的绝对路径：例D:\workspace\MyWork\examples\base\target\classes\org\springframework
 	 * @param pattern the pattern to match against,
+	 *                通配符子路径 ： 例 **\/*.xml
 	 * relative to the root directory
 	 * @return a mutable Set of matching Resource instances
 	 * @throws IOException if directory contents could not be retrieved
 	 */
 	protected Set<File> retrieveMatchingFiles(File rootDir, String pattern) throws IOException {
-		if (!rootDir.exists()) {
+		if (!rootDir.exists()) {//验证根路径文件是否存在
 			// Silently skip non-existing directories.
 			if (logger.isDebugEnabled()) {
 				logger.debug("Skipping [" + rootDir.getAbsolutePath() + "] because it does not exist");
 			}
 			return Collections.emptySet();
 		}
-		if (!rootDir.isDirectory()) {
+		if (!rootDir.isDirectory()) {//验证根路径是否是 目录
 			// Complain louder if it exists but is no directory.
 			if (logger.isInfoEnabled()) {
 				logger.info("Skipping [" + rootDir.getAbsolutePath() + "] because it does not denote a directory");
 			}
 			return Collections.emptySet();
 		}
-		if (!rootDir.canRead()) {
+		if (!rootDir.canRead()) {//验证根路径文件是否可读
 			if (logger.isInfoEnabled()) {
 				logger.info("Skipping search for matching files underneath directory [" + rootDir.getAbsolutePath() +
 						"] because the application is not allowed to read the directory");
 			}
 			return Collections.emptySet();
 		}
+		//将根路径分隔符替换为操作系统的文件分隔符
 		String fullPattern = StringUtils.replace(rootDir.getAbsolutePath(), File.separator, "/");
+		//如果通配符子路径是以 / 开始，则将根路径的尾部加上 /
 		if (!pattern.startsWith("/")) {
 			fullPattern += "/";
 		}
+		//加上通配符的文件绝对路径
+		// 例 ：D:/workspace/MyWork/examples/base/target/classes/org/springframework/**/*.xml
 		fullPattern = fullPattern + StringUtils.replace(pattern, File.separator, "/");
 		Set<File> result = new LinkedHashSet<>(8);
+		//递归迭代出所有根路径下所有与通配符路径匹配的文件
 		doRetrieveMatchingFiles(fullPattern, rootDir, result);
 		return result;
 	}
@@ -833,28 +849,34 @@ public class PathMatchingResourcePatternResolver implements ResourcePatternResol
 	 * adding them to the given result list.
 	 * @param fullPattern the pattern to match against,
 	 * with prepended root directory path
+	 *                     带通配符的全路径 例D:/workspace/MyWork/examples/base/target/classes/org/springframework/**\/*.xml
 	 * @param dir the current directory
-	 * @param result the Set of matching File instances to add to
+	 *            			根路径 例  D:\workspace\MyWork\examples\base\target\classes\org\springframework
+	 * @param result the Set of matching File instances to add to 结果集
 	 * @throws IOException if directory contents could not be retrieved
 	 */
 	protected void doRetrieveMatchingFiles(String fullPattern, File dir, Set<File> result) throws IOException {
 		if (logger.isTraceEnabled()) {
 			logger.trace("Searching directory [" + dir.getAbsolutePath() +
 					"] for files matching pattern [" + fullPattern + "]");
-		}
-		for (File content : listDirectory(dir)) {
+		}//listDirectory(dir) 返回根路径下所有的文件
+		for (File content : listDirectory(dir)) {//遍历返回的每个文件，与通配符进行匹配，如果符合就加入到结果集中
+			//遍历中的文件 currPath : D:/workspace/MyWork/examples/base/target/classes/org/springframework/bean
 			String currPath = StringUtils.replace(content.getAbsolutePath(), File.separator, "/");
+			//如果是目录，并且路径和通配符路径匹配，则继续向下级目录递归
 			if (content.isDirectory() && getPathMatcher().matchStart(fullPattern, currPath + "/")) {
-				if (!content.canRead()) {
+				if (!content.canRead()) {//如果当前文件不可读，则结束该次循环，进行下个文件的处理
 					if (logger.isDebugEnabled()) {
 						logger.debug("Skipping subdirectory [" + dir.getAbsolutePath() +
 								"] because the application is not allowed to read the directory");
 					}
 				}
 				else {
+					//递归
 					doRetrieveMatchingFiles(fullPattern, content, result);
 				}
 			}
+			//如果当前文件的路径与匹配路径相符，则将其加入到结果集中
 			if (getPathMatcher().match(fullPattern, currPath)) {
 				result.add(content);
 			}
@@ -869,6 +891,7 @@ public class PathMatchingResourcePatternResolver implements ResourcePatternResol
 	 * @see File#listFiles()
 	 */
 	protected File[] listDirectory(File dir) {
+		//返回根路径下的所有文件
 		File[] files = dir.listFiles();
 		if (files == null) {
 			if (logger.isInfoEnabled()) {
@@ -876,6 +899,7 @@ public class PathMatchingResourcePatternResolver implements ResourcePatternResol
 			}
 			return new File[0];
 		}
+		//根据文件名对文件进行排序
 		Arrays.sort(files, Comparator.comparing(File::getName));
 		return files;
 	}
