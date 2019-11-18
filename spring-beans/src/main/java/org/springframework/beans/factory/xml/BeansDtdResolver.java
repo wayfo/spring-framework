@@ -43,14 +43,22 @@ import org.springframework.lang.Nullable;
  * @see ResourceEntityResolver
  */
 public class BeansDtdResolver implements EntityResolver {
-
+	//DTD 文件的后缀
 	private static final String DTD_EXTENSION = ".dtd";
-
+	//Spring Bean DTD 的文件名
 	private static final String DTD_NAME = "spring-beans";
 
 	private static final Log logger = LogFactory.getLog(BeansDtdResolver.class);
 
 
+	/**
+	 * 对 systemId 进行了简单的校验（从最后一个 / 开始，内容中是否包含 spring-beans），
+	 * 然后构造一个 InputSource 对象，并设置 publicId、systemId 属性，然后返回。
+	 * @param publicId
+	 * @param systemId
+	 * @return
+	 * @throws IOException
+	 */
 	@Override
 	@Nullable
 	public InputSource resolveEntity(@Nullable String publicId, @Nullable String systemId) throws IOException {
@@ -58,9 +66,11 @@ public class BeansDtdResolver implements EntityResolver {
 			logger.trace("Trying to resolve XML entity with public ID [" + publicId +
 					"] and system ID [" + systemId + "]");
 		}
-
+		// 必须以 .dtd 结尾
 		if (systemId != null && systemId.endsWith(DTD_EXTENSION)) {
+			// 获取最后一个 / 的位置
 			int lastPathSeparator = systemId.lastIndexOf('/');
+			// 是否包含 spring-beans
 			int dtdNameStart = systemId.indexOf(DTD_NAME, lastPathSeparator);
 			if (dtdNameStart != -1) {
 				String dtdFile = DTD_NAME + DTD_EXTENSION;
@@ -68,7 +78,9 @@ public class BeansDtdResolver implements EntityResolver {
 					logger.trace("Trying to locate [" + dtdFile + "] in Spring jar on classpath");
 				}
 				try {
+					// 创建 ClassPathResource 对象
 					Resource resource = new ClassPathResource(dtdFile, getClass());
+					// 创建 InputSource 对象，并设置 publicId、systemId 属性
 					InputSource source = new InputSource(resource.getInputStream());
 					source.setPublicId(publicId);
 					source.setSystemId(systemId);
@@ -84,7 +96,7 @@ public class BeansDtdResolver implements EntityResolver {
 				}
 			}
 		}
-
+		//非 DTD 验证返回 null 此时使用默认行为，从网络上下载
 		// Fall back to the parser's default behavior.
 		return null;
 	}

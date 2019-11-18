@@ -77,6 +77,20 @@ public class DelegatingEntityResolver implements EntityResolver {
 	}
 
 
+
+	/**
+	 * @Description EntityResolver 的作用就是，通过实现它，应用可以自定义如何寻找【验证文件】的逻辑。
+	 * @Param publicId 被引用的外部实体的公共标识符
+	 * XSD验证模式
+	 * 例：  systemId：http://www.springframework.org/schema/beans/spring-beans.xsd
+	 * DTD 验证模式
+	 * 例：
+	 * 		publicId：-//SPRING//DTD BEAN 2.0//EN
+	 * 		systemId：http://www.springframework.org/dtd/spring-beans.dtd
+	 * @Param systemId 被引用的外部实体的系统标识符
+	 * @Author yangsj
+	 * @Date 2019/11/18 16:12
+	 **/
 	@Override
 	@Nullable
 	public InputSource resolveEntity(@Nullable String publicId, @Nullable String systemId)
@@ -84,9 +98,11 @@ public class DelegatingEntityResolver implements EntityResolver {
 
 		if (systemId != null) {
 			if (systemId.endsWith(DTD_SUFFIX)) {
+				//如果是 DTD 验证模式，则使用 BeansDtdResolver 来进行解析
 				return this.dtdResolver.resolveEntity(publicId, systemId);
 			}
 			else if (systemId.endsWith(XSD_SUFFIX)) {
+				//如果是 XSD 验证模式，则使用 PluggableSchemaResolver 来进行解析
 				return this.schemaResolver.resolveEntity(publicId, systemId);
 			}
 		}
