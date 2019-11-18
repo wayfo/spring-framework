@@ -78,22 +78,22 @@ import org.springframework.util.xml.XmlValidationModeDetector;
  */
 public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 
-	/**
+	/**　禁用验证模式
 	 * Indicates that the validation should be disabled.
 	 */
 	public static final int VALIDATION_NONE = XmlValidationModeDetector.VALIDATION_NONE;
 
-	/**
+	/**　自动获取验证模式
 	 * Indicates that the validation mode should be detected automatically.
 	 */
 	public static final int VALIDATION_AUTO = XmlValidationModeDetector.VALIDATION_AUTO;
 
-	/**
+	/**　DTD 验证模式
 	 * Indicates that DTD validation should be used.
 	 */
 	public static final int VALIDATION_DTD = XmlValidationModeDetector.VALIDATION_DTD;
 
-	/**
+	/**　XSD 验证模式
 	 * Indicates that XSD validation should be used.
 	 */
 	public static final int VALIDATION_XSD = XmlValidationModeDetector.VALIDATION_XSD;
@@ -101,7 +101,7 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 
 	/** Constants instance for this class. */
 	private static final Constants constants = new Constants(XmlBeanDefinitionReader.class);
-
+    //验证模式。默认为自动模式。
 	private int validationMode = VALIDATION_AUTO;
 
 	private boolean namespaceAware = false;
@@ -120,11 +120,21 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 
 	private DocumentLoader documentLoader = new DefaultDocumentLoader();
 
+    /**
+     * @Description  EntityResolver 解析器
+     * @Author yangsj
+     * @Date 2019/11/18 10:08
+     **/
 	@Nullable
 	private EntityResolver entityResolver;
 
 	private ErrorHandler errorHandler = new SimpleSaxErrorHandler(logger);
 
+    /**
+     * @Description XML 验证模式探测器
+     * @Author yangsj
+     * @Date 2019/11/18 9:37
+     **/
 	private final XmlValidationModeDetector validationModeDetector = new XmlValidationModeDetector();
 
 	/**
@@ -258,7 +268,7 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 		this.entityResolver = entityResolver;
 	}
 
-	/**
+	/** 返回指定的解析器，如果没有指定，则构造一个未指定的默认解析器。
 	 * Return the EntityResolver to use, building a default resolver
 	 * if none specified.
 	 */
@@ -267,9 +277,11 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 			// Determine default EntityResolver to use.
 			ResourceLoader resourceLoader = getResourceLoader();
 			if (resourceLoader != null) {
+				//根据指定的 ResourceLoader 创建一个 ResourceEntityResolver 对象。
 				this.entityResolver = new ResourceEntityResolver(resourceLoader);
 			}
 			else {
+				//创建 一个 DelegatingEntityResolver 对象。该 Resolver 委托给默认的 BeansDtdResolver 和 PluggableSchemaResolver
 				this.entityResolver = new DelegatingEntityResolver(getBeanClassLoader());
 			}
 		}
@@ -456,14 +468,18 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 	 * @see #detectValidationMode
 	 */
 	protected int getValidationModeForResource(Resource resource) {
+		// 获取指定的验证模式
 		int validationModeToUse = getValidationMode();
+		//如果手动指定，则直接返回
 		if (validationModeToUse != VALIDATION_AUTO) {
 			return validationModeToUse;
 		}
+		// 自动获取验证模式
 		int detectedMode = detectValidationMode(resource);
 		if (detectedMode != VALIDATION_AUTO) {
 			return detectedMode;
 		}
+		//使用 VALIDATION_XSD 做为默认
 		// Hmm, we didn't get a clear indication... Let's assume XSD,
 		// since apparently no DTD declaration has been found up until
 		// detection stopped (before finding the document's root tag).
@@ -478,6 +494,7 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 	 * of the {@link #VALIDATION_AUTO} mode.
 	 */
 	protected int detectValidationMode(Resource resource) {
+		// 不可读，抛出 BeanDefinitionStoreException 异常
 		if (resource.isOpen()) {
 			throw new BeanDefinitionStoreException(
 					"Passed-in Resource [" + resource + "] contains an open stream: " +
@@ -485,7 +502,7 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 					"that is able to create fresh streams, or explicitly specify the validationMode " +
 					"on your XmlBeanDefinitionReader instance.");
 		}
-
+		// 打开 InputStream 流
 		InputStream inputStream;
 		try {
 			inputStream = resource.getInputStream();
@@ -498,6 +515,7 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 		}
 
 		try {
+			//  获取相应的验证模式
 			return this.validationModeDetector.detectValidationMode(inputStream);
 		}
 		catch (IOException ex) {

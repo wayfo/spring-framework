@@ -25,7 +25,7 @@ import org.xml.sax.SAXException;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
-/**
+/** 实现 EntityResolver 接口，分别代理 dtd 的 BeansDtdResolver 和 xml schemas 的 PluggableSchemaResolver
  * {@link EntityResolver} implementation that delegates to a {@link BeansDtdResolver}
  * and a {@link PluggableSchemaResolver} for DTDs and XML schemas, respectively.
  *
@@ -50,7 +50,7 @@ public class DelegatingEntityResolver implements EntityResolver {
 	private final EntityResolver schemaResolver;
 
 
-	/**
+	/** 默认
 	 * Create a new DelegatingEntityResolver that delegates to
 	 * a default {@link BeansDtdResolver} and a default {@link PluggableSchemaResolver}.
 	 * <p>Configures the {@link PluggableSchemaResolver} with the supplied
@@ -63,7 +63,7 @@ public class DelegatingEntityResolver implements EntityResolver {
 		this.schemaResolver = new PluggableSchemaResolver(classLoader);
 	}
 
-	/**
+	/** 自定义
 	 * Create a new DelegatingEntityResolver that delegates to
 	 * the given {@link EntityResolver EntityResolvers}.
 	 * @param dtdResolver the EntityResolver to resolve DTDs with

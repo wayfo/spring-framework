@@ -30,12 +30,17 @@ import org.xml.sax.InputSource;
  */
 public interface DocumentLoader {
 
-	/**
+	/** 该方法由 DocumentLoader 的默认实现类 org.springframework.beans.factory.xml.DefaultDocumentLoader 实现
 	 * Load a {@link Document document} from the supplied {@link InputSource source}.
 	 * @param inputSource the source of the document that is to be loaded
+	 *                    加载 Document 的 Resource 资源
 	 * @param entityResolver the resolver that is to be used to resolve any entities
+	 *                    解析文件的解析器
 	 * @param errorHandler used to report any errors during document loading
+	 *                    处理加载 Document 对象的过程的错误
 	 * @param validationMode the type of validation
+	 *                    验证模式
+	 * @namespaceAware   命名空间支持。如果要提供对 XML 名称空间的支持，则需要值为 true
 	 * {@link org.springframework.util.xml.XmlValidationModeDetector#VALIDATION_DTD DTD}
 	 * or {@link org.springframework.util.xml.XmlValidationModeDetector#VALIDATION_XSD XSD})
 	 * @param namespaceAware {@code true} if support for XML namespaces is to be provided

@@ -30,7 +30,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.lang.Nullable;
 
-/**
+/** 继承自 DelegatingEntityResolver 类，通过 ResourceLoader 来解析实体的引用
  * {@code EntityResolver} implementation that tries to resolve entity references
  * through a {@link org.springframework.core.io.ResourceLoader} (usually,
  * relative to the resource base of an {@code ApplicationContext}), if applicable.

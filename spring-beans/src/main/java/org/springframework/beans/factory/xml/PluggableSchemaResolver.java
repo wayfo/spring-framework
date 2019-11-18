@@ -34,7 +34,7 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 
-/**
+/**  实现 EntityResolver 接口，读取 classpath 下的所有 "META-INF/spring.schemas" 成一个 namespaceURI 与 Schema 文件地址的 map
  * {@link EntityResolver} implementation that attempts to resolve schema URLs into
  * local {@link ClassPathResource classpath resources} using a set of mappings files.
  *
@@ -69,9 +69,15 @@ public class PluggableSchemaResolver implements EntityResolver {
 	@Nullable
 	private final ClassLoader classLoader;
 
+	/**
+	 * @Description  Schema 文件地址
+	 * @Author yangsj
+	 * @Date 2019/11/18 10:13
+	 **/
 	private final String schemaMappingsLocation;
 
 	/** Stores the mapping of schema URL -> local schema path. */
+	// namespaceURI 与 Schema 文件地址的映射集合
 	@Nullable
 	private volatile Map<String, String> schemaMappings;
 
