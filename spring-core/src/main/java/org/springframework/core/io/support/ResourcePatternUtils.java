@@ -32,7 +32,8 @@ import org.springframework.util.ResourceUtils;
  */
 public abstract class ResourcePatternUtils {
 
-	/**
+	/** 1、以 classpath*: 或者 classpath: 开头的为绝对路径。
+	 *  2、能够通过该 location 构建出 java.net.URL 为绝对路径。
 	 * Return whether the given resource location is a URL: either a
 	 * special "classpath" or "classpath*" pseudo URL or a standard URL.
 	 * @param resourceLocation the location String to check

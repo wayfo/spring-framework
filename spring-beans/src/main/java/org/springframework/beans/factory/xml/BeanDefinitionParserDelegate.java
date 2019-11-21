@@ -1361,7 +1361,7 @@ public class BeanDefinitionParserDelegate {
 		return TRUE_VALUE.equals(value);
 	}
 
-	/**
+	/** 如果根节点或子节点不使用默认命名空间，执行自定义解析
 	 * Parse a custom element (outside of the default namespace).
 	 * @param ele the element to parse
 	 * @return the resulting bean definition

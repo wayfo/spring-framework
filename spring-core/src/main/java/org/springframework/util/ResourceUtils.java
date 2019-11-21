@@ -370,7 +370,7 @@ public abstract class ResourceUtils {
 		return toURI(url.toString());
 	}
 
-	/**
+	/** 根据 location 构造 java.net.URI 判断调用 #isAbsolute() 方法，判断是否为绝对路径。
 	 * Create a URI instance for the given location String,
 	 * replacing spaces with "%20" URI encoding first.
 	 * @param location the location String to convert into a URI instance
