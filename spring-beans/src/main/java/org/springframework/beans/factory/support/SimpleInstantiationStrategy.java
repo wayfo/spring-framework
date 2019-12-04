@@ -43,6 +43,9 @@ import org.springframework.util.StringUtils;
  */
 public class SimpleInstantiationStrategy implements InstantiationStrategy {
 
+	/**
+	 * 线程变量，正在创建 Bean 的 Method 对象
+	 */
 	private static final ThreadLocal<Method> currentlyInvokedFactoryMethod = new ThreadLocal<>();
 
 
@@ -133,11 +136,25 @@ public class SimpleInstantiationStrategy implements InstantiationStrategy {
 		throw new UnsupportedOperationException("Method Injection not supported in SimpleInstantiationStrategy");
 	}
 
+	/**
+	 * 创建 bean 实例
+	 * @param bd the bean definition
+	 * @param beanName the name of the bean when it is created in this context.
+	 * The name can be {@code null} if we are autowiring a bean which doesn't
+	 * belong to the factory.
+	 * @param owner the owning BeanFactory
+	 * @param factoryBean the factory bean instance to call the factory method on,
+	 * or {@code null} in case of a static factory method
+	 * @param factoryMethod the factory method to use
+	 * @param args the factory method arguments to apply
+	 * @return
+	 */
 	@Override
 	public Object instantiate(RootBeanDefinition bd, @Nullable String beanName, BeanFactory owner,
 			@Nullable Object factoryBean, final Method factoryMethod, Object... args) {
 
 		try {
+			// 设置 Method 可访问
 			if (System.getSecurityManager() != null) {
 				AccessController.doPrivileged((PrivilegedAction<Object>) () -> {
 					ReflectionUtils.makeAccessible(factoryMethod);
@@ -147,17 +164,22 @@ public class SimpleInstantiationStrategy implements InstantiationStrategy {
 			else {
 				ReflectionUtils.makeAccessible(factoryMethod);
 			}
-
+			// 获得原 Method 对象
 			Method priorInvokedFactoryMethod = currentlyInvokedFactoryMethod.get();
 			try {
+				// 获得原 Method 对象
 				currentlyInvokedFactoryMethod.set(factoryMethod);
+				// 利用 Java 反射执行工厂方法并返回创建好的实例
+				// <x> 核心 创建 Bean 对象
 				Object result = factoryMethod.invoke(factoryBean, args);
+				// 未创建，则创建 NullBean 对象
 				if (result == null) {
 					result = new NullBean();
 				}
 				return result;
 			}
 			finally {
+				// 设置老的 Method 对象，到 currentlyInvokedFactoryMethod 中
 				if (priorInvokedFactoryMethod != null) {
 					currentlyInvokedFactoryMethod.set(priorInvokedFactoryMethod);
 				}

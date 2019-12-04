@@ -734,6 +734,8 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	}
 
 	/**
+	 * 创建 Bean 的 Supplier 对象
+	 *
 	 * Specify a callback for creating an instance of the bean,
 	 * as an alternative to a declaratively specified factory method.
 	 * <p>If such a callback is set, it will override any other constructor
@@ -1110,11 +1112,15 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	public void prepareMethodOverrides() throws BeanDefinitionValidationException {
 		// Check that lookup methods exist and determine their overloaded status.
 		if (hasMethodOverrides()) {
+			// 如果存在 methodOverrides ，则获取所有的 override method
+			// 循环，执行 prepareMethodOverride
 			getMethodOverrides().getOverrides().forEach(this::prepareMethodOverride);
 		}
 	}
 
 	/**
+	 * 对 methodOverrides 属性做了一些简单的校验而已
+	 *
 	 * Validate and prepare the given method override.
 	 * Checks for existence of a method with the specified name,
 	 * marking it as not overloaded if none found.
@@ -1122,12 +1128,15 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	 * @throws BeanDefinitionValidationException in case of validation failure
 	 */
 	protected void prepareMethodOverride(MethodOverride mo) throws BeanDefinitionValidationException {
+		// 从 class 中获取该方法名的个数
 		int count = ClassUtils.getMethodCountForName(getBeanClass(), mo.getMethodName());
+		// 如果个数为 0 ，则抛出 BeanDefinitionValidationException 异常
 		if (count == 0) {
 			throw new BeanDefinitionValidationException(
 					"Invalid method override: no method with name '" + mo.getMethodName() +
 					"' on class [" + getBeanClassName() + "]");
 		}
+		// 如果个数为 1 ，则设置该重载方法没有被重载
 		else if (count == 1) {
 			// Mark override as not overloaded, to avoid the overhead of arg type checking.
 			mo.setOverloaded(false);

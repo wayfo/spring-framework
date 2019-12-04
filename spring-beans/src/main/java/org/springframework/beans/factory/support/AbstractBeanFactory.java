@@ -1523,6 +1523,9 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	}
 
 	/**
+	 *
+	 *该方法主要是解析 bean definition 的 class 类，并将已经解析的 Class 存储在 bean definition 中以供后面使用。
+	 *
 	 * Resolve the bean class for the specified bean definition,
 	 * resolving a bean class name into a Class reference (if necessary)
 	 * and storing the resolved Class in the bean definition for further use.
@@ -2031,8 +2034,11 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	 * in case of a child definition.
 	 * <p>All bean retrieval methods delegate to this method for actual bean creation.
 	 * @param beanName the name of the bean
+	 *                 bean 的名字
 	 * @param mbd the merged bean definition for the bean
+	 *                已经合并了父类属性的（如果有的话）BeanDefinition 对象
 	 * @param args explicit arguments to use for constructor or factory method invocation
+	 *                用于构造函数或者工厂方法创建 Bean 实例对象的参数
 	 * @return a new instance of the bean
 	 * @throws BeanCreationException if the bean could not be created
 	 */
