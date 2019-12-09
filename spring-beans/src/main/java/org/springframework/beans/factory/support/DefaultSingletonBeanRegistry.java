@@ -176,6 +176,11 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	}
 
 	/**
+	 * singletonFactories 这个三级缓存才是解决 Spring Bean 循环依赖的诀窍所在。
+	 * 同时这段代码发生在 #createBeanInstance(...) 方法之后，也就是说这个 bean 其实已经被创建出来了，
+	 * 但是它还不是很完美（没有进行属性填充和初始化），但是对于其他依赖它的对象而言已经足够了（可以根据对象引用定位到堆中对象），
+	 * 能够被认出来了。所以 Spring 在这个时候，选择将该对象提前曝光出来让大家认识认识。
+	 *
 	 * Add the given singleton factory for building the specified singleton
 	 * if necessary.
 	 * <p>To be called for eager registration of singletons, e.g. to be able to
@@ -204,6 +209,31 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	 * 单例缓存中获取 bean
 	 * 根据 beanName 依次检测 singletonObjects 、earlySingletonObjects 、 singletonFactories 这三个 Map，
 	 * 若为空，则检测下一个，否则返回。
+	 * 		singletonObjects ：单例对象的 Cache 。
+	 * 		singletonFactories ： 单例对象工厂的 Cache 。
+	 * 		earlySingletonObjects ：提前曝光的单例对象的 Cache 。
+	 * 	三级缓存：
+	 *
+	 * 		第一级为 singletonObjects
+	 * 		第二级为 earlySingletonObjects
+	 * 		第三级为 singletonFactories
+	 *
+	 * 	#isSingletonCurrentlyInCreation(String beanName) 方法：判断当前 singleton bean 是否处于创建中。bean 处于创建中，
+	 * 	也就是说 bean 在初始化但是没有完成初始化，有一个这样的过程其实和 Spring 解决 bean 循环依赖的理念相辅相成。
+	 * 	因为 Spring 解决 singleton bean 的核心就在于提前曝光 bean 。
+	 *
+	 * 	allowEarlyReference 变量：从字面意思上面理解就是允许提前拿到引用。其实真正的意思是，
+	 * 	是否允许从 singletonFactories 缓存中通过 #getObject() 方法，拿到对象。为什么会有这样一个字段呢？
+	 * 	原因就在于 singletonFactories 才是 Spring 解决 singleton bean 的诀窍所在，
+	 *
+	 *  过程：
+	 *
+	 * 		首先，从一级缓存 singletonObjects 获取。
+	 * 		如果，没有且当前指定的 beanName 正在创建，就再从二级缓存 earlySingletonObjects 中获取。
+	 * 		如果，还是没有获取到且允许 singletonFactories 通过 #getObject() 获取，则从三级缓存 singletonFactories 获取。如果获取到，则通过其 #getObject() 方法，获取对象，并将其加入到二级缓存 earlySingletonObjects 中，并从三级缓存 singletonFactories 删除。代码如下：
+	 * 	这样，就从三级缓存升级到二级缓存了。
+	 * 	所以，二级缓存存在的意义，就是缓存三级缓存中的 ObjectFactory 的 #getObject() 方法的执行结果，提早曝光的单例 Bean 对象。
+	 *
 	 * Return the (raw) singleton object registered under the given name.
 	 * <p>Checks already instantiated singletons and also allows for an early
 	 * reference to a currently created singleton (resolving a circular reference).
@@ -266,7 +296,7 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 				if (logger.isDebugEnabled()) {
 					logger.debug("Creating shared instance of singleton bean '" + beanName + "'");
 				}
-				// 加载前置处理
+				// 加载前置处理，添加当前 bean 正处于创建中标志，用于解决循环依赖
 				beforeSingletonCreation(beanName);
 				boolean newSingleton = false;
 				boolean recordSuppressedExceptions = (this.suppressedExceptions == null);
