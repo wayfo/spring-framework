@@ -20,6 +20,19 @@ import org.springframework.beans.BeansException;
 import org.springframework.lang.Nullable;
 
 /**
+ *
+ *1、BeanPostProcessor 的作用域是容器级别的，它只和所在的容器相关 ，当 BeanPostProcessor 完成注册后，
+ * 它会应用于所有跟它在同一个容器内的 bean 。
+ *
+ * 2、BeanFactory 和 ApplicationContext 对 BeanPostProcessor 的处理不同，
+ * ApplicationContext 会自动检测所有实现了 BeanPostProcessor 接口的 bean，并完成注册，
+ * 但是使用 BeanFactory 容器时则需要手动调用
+ * AbstractBeanFactory#addBeanPostProcessor(BeanPostProcessor beanPostProcessor) 方法来完成注册
+ *
+ * 3、ApplicationContext 的 BeanPostProcessor 支持 Ordered，而 BeanFactory 的 BeanPostProcessor 是不支持的，
+ * 原因在于ApplicationContext 会对 BeanPostProcessor 进行 Ordered 检测并完成排序，
+ * 而 BeanFactory 中的 BeanPostProcessor 只跟注册的顺序有关。
+ *
  * Factory hook that allows for custom modification of new bean instances &mdash;
  * for example, checking for marker interfaces or wrapping beans with proxies.
  *
@@ -58,6 +71,8 @@ import org.springframework.lang.Nullable;
 public interface BeanPostProcessor {
 
 	/**
+	 * BeanPostProcessor 的作用：在 Bean 完成实例化后，如果我们需要对其进行一些配置、增加一些自己的处理逻辑，那么请使用 BeanPostProcessor。
+	 *
 	 * Apply this {@code BeanPostProcessor} to the given new bean instance <i>before</i> any bean
 	 * initialization callbacks (like InitializingBean's {@code afterPropertiesSet}
 	 * or a custom init-method). The bean will already be populated with property values.
