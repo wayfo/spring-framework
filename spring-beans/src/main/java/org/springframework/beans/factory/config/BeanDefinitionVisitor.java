@@ -143,9 +143,12 @@ public class BeanDefinitionVisitor {
 
 	protected void visitPropertyValues(MutablePropertyValues pvs) {
 		PropertyValue[] pvArray = pvs.getPropertyValues();
+		// 遍历 PropertyValue 数组
 		for (PropertyValue pv : pvArray) {
+			// 解析真值
 			Object newVal = resolveValue(pv.getValue());
 			if (!ObjectUtils.nullSafeEquals(newVal, pv.getValue())) {
+				// 设置到 PropertyValue 中
 				pvs.add(pv.getName(), newVal);
 			}
 		}
@@ -218,6 +221,7 @@ public class BeanDefinitionVisitor {
 				typedStringValue.setValue(visitedString);
 			}
 		}
+		// 由于配置的是 String 类型，所以只需要看 String 相关的。所以重点在此处
 		else if (value instanceof String) {
 			return resolveStringValue((String) value);
 		}
@@ -293,6 +297,9 @@ public class BeanDefinitionVisitor {
 			throw new IllegalStateException("No StringValueResolver specified - pass a resolver " +
 					"object into the constructor or override the 'resolveStringValue' method");
 		}
+		// 解析真值
+		// valueResolver 是我们在构造 BeanDefinitionVisitor 实例时传入的 String 类型解析器 PlaceholderResolvingStringValueResolver，
+		// 调用其 #resolveStringValue(String strVal) 方法
 		String resolvedValue = this.valueResolver.resolveStringValue(strVal);
 		// Return original String if not modified.
 		return (strVal.equals(resolvedValue) ? strVal : resolvedValue);
