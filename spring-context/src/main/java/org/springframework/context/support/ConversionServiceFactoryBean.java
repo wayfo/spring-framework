@@ -27,6 +27,9 @@ import org.springframework.core.convert.support.GenericConversionService;
 import org.springframework.lang.Nullable;
 
 /**
+ * 向 ConversionService 中设置 converters
+ *
+ * 自定义 converter 必须设置到此工厂对象中，才会起作用
  * A factory providing convenient access to a ConversionService configured with
  * converters appropriate for most environments. Set the
  * {@link #setConverters "converters"} property to supplement the default converters.
