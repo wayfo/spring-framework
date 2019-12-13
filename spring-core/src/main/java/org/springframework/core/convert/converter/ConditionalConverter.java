@@ -19,6 +19,8 @@ package org.springframework.core.convert.converter;
 import org.springframework.core.convert.TypeDescriptor;
 
 /**
+ * ConditionalConverter 接口用于表示有条件的类型转换，通过转入的sourceType 与 targetType 判断转换能否匹配，只有可匹配的转换才会调用convert 方法进行转换。
+ *
  * Allows a {@link Converter}, {@link GenericConverter} or {@link ConverterFactory} to
  * conditionally execute based on attributes of the {@code source} and {@code target}
  * {@link TypeDescriptor}.
@@ -35,10 +37,10 @@ import org.springframework.core.convert.TypeDescriptor;
  * @author Phillip Webb
  * @author Keith Donald
  * @since 3.2
- * @see Converter
- * @see GenericConverter
- * @see ConverterFactory
- * @see ConditionalGenericConverter
+ * @see Converter			：用于 1:1 的 source -> target 类型转换。
+ * @see GenericConverter	：用于 1:N 的 source -> target 类型转换。
+ * @see ConverterFactory	：用于 N:N 的 source -> target 类型转换。
+ * @see ConditionalGenericConverter：有条件的 source -> target 类型转换。
  */
 public interface ConditionalConverter {
 
