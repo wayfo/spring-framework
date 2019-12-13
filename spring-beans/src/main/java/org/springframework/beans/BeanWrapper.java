@@ -19,6 +19,22 @@ package org.springframework.beans;
 import java.beans.PropertyDescriptor;
 
 /**
+ * BeanWrapper 体系相比于 Spring 中其他体系是比较简单的，它作为 BeanDefinition 向 Bean 转换过程中的中间产物，
+ * 承载了 Bean 实例的包装、类型转换、属性的设置以及访问等重要作用。
+ *
+ *  * BeanWrapper 主要继承三个核心接口：PropertyAccessor、PropertyEditorRegistry、TypeConverter。
+ *  *
+ *  * BeanWrapper 继承上述三个接口，那么它就具有三重身份：
+ *  *    属性编辑器
+ *  *    属性编辑器注册表
+ *  *    类型转换器
+ *
+ * BeanWrapper 继承 ConfigurablePropertyAccessor 接口，
+ * 该接口除了继承上面介绍的三个接口外还集成了 Spring 的 ConversionService 类型转换体系。
+ *
+ * Spring 的 低级 JavaBean 基础结构的接口，一般不会直接使用，而是通过 BeanFactory 或者 DataBinder 隐式使用。
+ *
+ *
  * The central interface of Spring's low-level JavaBeans infrastructure.
  *
  * <p>Typically not used directly but rather implicitly via a
@@ -62,16 +78,22 @@ public interface BeanWrapper extends ConfigurablePropertyAccessor {
 	int getAutoGrowCollectionLimit();
 
 	/**
+	 * 获取包装对象的实例
+	 *
 	 * Return the bean instance wrapped by this object.
 	 */
 	Object getWrappedInstance();
 
 	/**
+	 * 获取包装对象的类型。
+	 *
 	 * Return the type of the wrapped bean instance.
 	 */
 	Class<?> getWrappedClass();
 
 	/**
+	 * 获取包装对象所有属性的 PropertyDescriptor 就是这个属性的上下文。
+	 *
 	 * Obtain the PropertyDescriptors for the wrapped object
 	 * (as determined by standard JavaBeans introspection).
 	 * @return the PropertyDescriptors for the wrapped object
@@ -79,6 +101,8 @@ public interface BeanWrapper extends ConfigurablePropertyAccessor {
 	PropertyDescriptor[] getPropertyDescriptors();
 
 	/**
+	 * 获取包装对象指定属性的上下文。
+	 *
 	 * Obtain the property descriptor for a specific property
 	 * of the wrapped object.
 	 * @param propertyName the property to obtain the descriptor for
