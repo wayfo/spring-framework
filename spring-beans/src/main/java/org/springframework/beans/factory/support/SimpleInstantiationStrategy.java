@@ -60,6 +60,19 @@ public class SimpleInstantiationStrategy implements InstantiationStrategy {
 	}
 
 
+	/**
+	 * 默认构造方法
+	 *
+	 * 如果是构造方法实例化，则是先判断是否有 MethodOverrides，如果没有则是直接使用反射，
+	 * 如果有则就需要 CGLIB 实例化对象。
+	 *
+	 * @param bd the bean definition
+	 * @param beanName the name of the bean when it is created in this context.
+	 * The name can be {@code null} if we are autowiring a bean which doesn't
+	 * belong to the factory.
+	 * @param owner the owning BeanFactory
+	 * @return
+	 */
 	@Override
 	public Object instantiate(RootBeanDefinition bd, @Nullable String beanName, BeanFactory owner) {
 		// Don't override the class with CGLIB if no overrides.
@@ -103,6 +116,9 @@ public class SimpleInstantiationStrategy implements InstantiationStrategy {
 	}
 
 	/**
+	 * SimpleInstantiationStrategy 对 #instantiateWithMethodInjection(RootBeanDefinition bd, String beanName, BeanFactory owner, Constructor<?> ctor, Object... args) 的实现任务
+	 * 交给了子类 CglibSubclassingInstantiationStrategy
+	 *
 	 * Subclasses can override this method, which is implemented to throw
 	 * UnsupportedOperationException, if they can instantiate an object with
 	 * the Method Injection specified in the given RootBeanDefinition.
@@ -112,6 +128,18 @@ public class SimpleInstantiationStrategy implements InstantiationStrategy {
 		throw new UnsupportedOperationException("Method Injection not supported in SimpleInstantiationStrategy");
 	}
 
+	/**
+	 * 指定构造方法
+	 *
+	 * @param bd the bean definition
+	 * @param beanName the name of the bean when it is created in this context.
+	 * The name can be {@code null} if we are autowiring a bean which doesn't
+	 * belong to the factory.
+	 * @param owner the owning BeanFactory
+	 * @param ctor the constructor to use
+	 * @param args the constructor arguments to apply
+	 * @return
+	 */
 	@Override
 	public Object instantiate(RootBeanDefinition bd, @Nullable String beanName, BeanFactory owner,
 			final Constructor<?> ctor, Object... args) {
@@ -151,6 +179,9 @@ public class SimpleInstantiationStrategy implements InstantiationStrategy {
 
 	/**
 	 * 创建 bean 实例
+	 *
+	 * 如果是工厂方法实例化，则直接使用反射创建对象
+	 *
 	 * @param bd the bean definition
 	 * @param beanName the name of the bean when it is created in this context.
 	 * The name can be {@code null} if we are autowiring a bean which doesn't
@@ -180,7 +211,7 @@ public class SimpleInstantiationStrategy implements InstantiationStrategy {
 			// 获得原 Method 对象
 			Method priorInvokedFactoryMethod = currentlyInvokedFactoryMethod.get();
 			try {
-				// 获得原 Method 对象
+				// 设置新的 Method 对象，到 currentlyInvokedFactoryMethod 中
 				currentlyInvokedFactoryMethod.set(factoryMethod);
 				// 利用 Java 反射执行工厂方法并返回创建好的实例
 				// <x> 核心 创建 Bean 对象
@@ -201,6 +232,7 @@ public class SimpleInstantiationStrategy implements InstantiationStrategy {
 				}
 			}
 		}
+		// 一大堆 catch 异常
 		catch (IllegalArgumentException ex) {
 			throw new BeanInstantiationException(factoryMethod,
 					"Illegal arguments to factory method '" + factoryMethod.getName() + "'; " +

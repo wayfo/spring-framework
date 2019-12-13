@@ -40,6 +40,9 @@ import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
 /**
+ * 类 CglibSubclassingInstantiationStrategy 为 Spring 实例化 Bean 的默认实例化策略，
+ * 其主要功能还是对父类功能进行补充：其父类将 CGLIB 的实例化策略委托其实现。
+ *
  * Default object instantiation strategy for use in BeanFactories.
  *
  * <p>Uses CGLIB to generate subclasses dynamically if methods need to be
@@ -76,6 +79,15 @@ public class CglibSubclassingInstantiationStrategy extends SimpleInstantiationSt
 		return instantiateWithMethodInjection(bd, beanName, owner, null);
 	}
 
+	/**
+	 * CglibSubclassingInstantiationStrategy 实例化 Bean 策略，是通过其内部类 CglibSubclassCreator 来实现的
+	 * @param bd
+	 * @param beanName
+	 * @param owner
+	 * @param ctor
+	 * @param args
+	 * @return
+	 */
 	@Override
 	protected Object instantiateWithMethodInjection(RootBeanDefinition bd, @Nullable String beanName, BeanFactory owner,
 			@Nullable Constructor<?> ctor, Object... args) {
