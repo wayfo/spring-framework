@@ -74,11 +74,12 @@ public class PropertyPlaceholderHelper {
 
 	/**
 	 * Creates a new {@code PropertyPlaceholderHelper} that uses the supplied prefix and suffix.
-	 * @param placeholderPrefix the prefix that denotes the start of a placeholder
-	 * @param placeholderSuffix the suffix that denotes the end of a placeholder
+	 * @param placeholderPrefix the prefix that denotes the start of a placeholder 占位符前缀
+	 * @param placeholderSuffix the suffix that denotes the end of a placeholder 占位符后缀
 	 * @param valueSeparator the separating character between the placeholder variable
-	 * and the associated default value, if any
+	 * and the associated default value, if any 占位符变量与关联的默认值之间的分隔符
 	 * @param ignoreUnresolvablePlaceholders indicates whether unresolvable placeholders should
+	 *                                          指示是否忽略不可解析的占位符（true）或抛出异常（false）
 	 * be ignored ({@code true}) or cause an exception ({@code false})
 	 */
 	public PropertyPlaceholderHelper(String placeholderPrefix, String placeholderSuffix,
