@@ -21,6 +21,8 @@ import java.util.Locale;
 import org.springframework.lang.Nullable;
 
 /**
+ * 解析 message 的策略接口，用于支撑国际化等功能
+ *
  * Strategy interface for resolving messages, with support for the parameterization
  * and internationalization of such messages.
  *

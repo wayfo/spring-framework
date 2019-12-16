@@ -21,6 +21,10 @@ import org.springframework.core.ResolvableType;
 import org.springframework.lang.Nullable;
 
 /**
+ * Spring 管理 Bean 的顶层接口，我们可以认为他是一个简易版的 Spring 容器。
+ *
+ * ApplicationContext 继承 BeanFactory 的两个子类：HierarchicalBeanFactory 和 ListableBeanFactory。
+ *
  * The root interface for accessing a Spring bean container.
  * This is the basic client view of a bean container;
  * further interfaces such as {@link ListableBeanFactory} and

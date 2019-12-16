@@ -21,7 +21,8 @@ import java.io.IOException;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 
-/** ResourceLoader 的 Resource getResource(String location) 方法，每次只能根据 location 返回一个 Resource 。
+/**
+ *  ResourceLoader 的 Resource getResource(String location) 方法，每次只能根据 location 返回一个 Resource 。
  *  当需要加载多个资源时，我们除了多次调用 #getResource(String location) 方法外，别无他法。
  *
  *

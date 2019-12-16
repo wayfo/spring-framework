@@ -34,6 +34,8 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 /**
+ * Environment 的基础实现
+ *
  * Abstract base class for {@link Environment} implementations. Supports the notion of
  * reserved default profile names and enables specifying active and default profiles
  * through the {@link #ACTIVE_PROFILES_PROPERTY_NAME} and
@@ -234,9 +236,12 @@ public abstract class AbstractEnvironment implements ConfigurableEnvironment {
 	 */
 	protected Set<String> doGetActiveProfiles() {
 		synchronized (this.activeProfiles) {
+			// 如果 activeProfiles 为空，则进行初始化
 			if (this.activeProfiles.isEmpty()) {
+				// 获得 ACTIVE_PROFILES_PROPERTY_NAME 对应的 profiles 属性值
 				String profiles = getProperty(ACTIVE_PROFILES_PROPERTY_NAME);
 				if (StringUtils.hasText(profiles)) {
+					// 设置到 activeProfiles 中
 					setActiveProfiles(StringUtils.commaDelimitedListToStringArray(
 							StringUtils.trimAllWhitespace(profiles)));
 				}
@@ -245,6 +250,10 @@ public abstract class AbstractEnvironment implements ConfigurableEnvironment {
 		}
 	}
 
+	/**
+	 * 该方法其实就是操作 activeProfiles 集合，在每次设置之前都会将该集合清空重新添加
+	 * @param profiles
+	 */
 	@Override
 	public void setActiveProfiles(String... profiles) {
 		Assert.notNull(profiles, "Profile array must not be null");
@@ -252,8 +261,11 @@ public abstract class AbstractEnvironment implements ConfigurableEnvironment {
 			logger.debug("Activating profiles " + Arrays.asList(profiles));
 		}
 		synchronized (this.activeProfiles) {
+			// 清空 activeProfiles
 			this.activeProfiles.clear();
+			// 遍历 profiles 数组，添加到 activeProfiles 中
 			for (String profile : profiles) {
+				// 校验
 				validateProfile(profile);
 				this.activeProfiles.add(profile);
 			}

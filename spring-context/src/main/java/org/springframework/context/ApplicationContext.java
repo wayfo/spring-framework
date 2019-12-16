@@ -49,6 +49,13 @@ import org.springframework.lang.Nullable;
  * {@link ApplicationContextAware} beans as well as {@link ResourceLoaderAware},
  * {@link ApplicationEventPublisherAware} and {@link MessageSourceAware} beans.
  *
+ * 继承 MessageSource，提供国际化的标准访问策略
+ * 继承 ApplicationEventPublisher ，提供强大的事件机制
+ * 扩展 ResourceLoader，可以用来加载多个 Resource
+ * 支持 Web 应用
+ *
+ * ApplicationContext 有两个直接子类：WebApplicationContext 和 ConfigurableApplicationContext
+ *
  * @author Rod Johnson
  * @author Juergen Hoeller
  * @see ConfigurableApplicationContext

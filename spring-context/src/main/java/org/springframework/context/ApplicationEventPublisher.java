@@ -17,6 +17,8 @@
 package org.springframework.context;
 
 /**
+ * 用于封装事件发布功能的接口，向事件监听器（Listener）发送事件消息
+ *
  * Interface that encapsulates event publication functionality.
  *
  * <p>Serves as a super-interface for {@link ApplicationContext}.
@@ -52,6 +54,8 @@ public interface ApplicationEventPublisher {
 	}
 
 	/**
+	 * 用于通知在此应用程序中注册的所有的监听器。该方法在 AbstractApplicationContext 中实现
+	 *
 	 * Notify all <strong>matching</strong> listeners registered with this
 	 * application of an event.
 	 * <p>If the specified {@code event} is not an {@link ApplicationEvent},

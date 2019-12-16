@@ -151,6 +151,7 @@ public abstract class AbstractRefreshableConfigApplicationContext extends Abstra
 	@Override
 	public void afterPropertiesSet() {
 		if (!isActive()) {
+			// 执行 refresh() 方法，该方法在 AbstractApplicationContext 中执行，执行整个 Spring 容器的初始化过程
 			refresh();
 		}
 	}

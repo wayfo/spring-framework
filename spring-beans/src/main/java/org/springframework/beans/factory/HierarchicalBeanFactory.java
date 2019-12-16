@@ -19,6 +19,8 @@ package org.springframework.beans.factory;
 import org.springframework.lang.Nullable;
 
 /**
+ * HierarchicalBeanFactory 是一个具有层级关系的 BeanFactory，拥有属性 parentBeanFactory
+ *
  * Sub-interface implemented by bean factories that can be part
  * of a hierarchy.
  *
