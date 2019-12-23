@@ -153,6 +153,8 @@ public abstract class HttpServletBean extends HttpServlet implements Environment
 	}
 
 	/**
+	 * init 方法会在 servlet 容器启动时由容器调用
+	 *
 	 * 负责将 ServletConfig 设置到当前 Servlet 对象中
 	 *
 	 * Map config parameters onto bean properties of this servlet, and
