@@ -532,11 +532,12 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 			prepareRefresh();
 
 			// Tell the subclass to refresh the internal bean factory.
-			// 创建并初始化 BeanFactory
+			// 获取BeanFactory 默认实现是DefaultListableBeanFactory
+			// 加载BeanDefition 并注册到 BeanDefitionRegistry
 			ConfigurableListableBeanFactory beanFactory = obtainFreshBeanFactory();
 
 			// Prepare the bean factory for use in this context.
-			// 填充BeanFactory功能
+			// 填充BeanFactory功能,BeanFactory的预准备工作(BeanFactory进行一些设置，比如context的类加 载器等)
 			prepareBeanFactory(beanFactory);
 
 			try {
@@ -545,31 +546,35 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 				postProcessBeanFactory(beanFactory);
 
 				// Invoke factory processors registered as beans in the context.
-				// 激活各种BeanFactory处理器
+				// 实例化并调用实现了BeanFactoryPostProcessor接口的Bean
 				invokeBeanFactoryPostProcessors(beanFactory);
 
 				// Register bean processors that intercept bean creation.
-				// 注册拦截Bean创建的Bean处理器，即注册 BeanPostProcessor
+				// 注册BeanPostProcessor(Bean的后置处理器)，在创建bean的前后等执行
 				registerBeanPostProcessors(beanFactory);
 
 				// Initialize message source for this context.
-				// 初始化上下文中的资源文件，如国际化文件的处理等
+				// 初始化MessageSource组件(做国际化功能;消息绑定，消息解析)
 				initMessageSource();
 
 				// Initialize event multicaster for this context.
-				// 初始化上下文事件广播器
+				// 初始化事件派发器
 				initApplicationEventMulticaster();
 
 				// Initialize other special beans in specific context subclasses.
-				// 给子类扩展初始化其他Bean
+				// 子类重写这个方法，在容器刷新的时候可以自定义逻辑
 				onRefresh();
 
 				// Check for listener beans and register them.
-				// 在所有bean中查找listener bean，然后注册到广播器中
+				// 注册应用的监听器。就是注册实现了ApplicationListener接口的监听器Bean
 				registerListeners();
 
 				// Instantiate all remaining (non-lazy-init) singletons.
 				// 初始化剩下的单例Bean(非延迟加载的)
+				// 填充属性
+				// 调用BeanPostProcessor(后置处理器)对实例bean进行前置处理
+				// 初始化方法调用(比如调用afterPropertiesSet方法、init-method方法)
+				// 调用BeanPostProcessor(后置处理器)对实例bean进行后置处理
 				finishBeanFactoryInitialization(beanFactory);
 
 				// Last step: publish corresponding event.
