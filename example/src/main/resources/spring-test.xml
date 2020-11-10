@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+	<!--自定义Bean-->
+	<bean id="user" class="com.nchu.spring.bean.User">
+		<property name="age" value="12"></property>
+		<property name="name" value="wayfo"></property>
+	</bean>
+
+	<!-- 自定义BeanPostProcessor 在Bean实例化过程中执行	-->
+	<bean id="beanPostProcessorTest" class="com.nchu.spring.beanpostprocessor.MyBeanPostProcessor"></bean>
+
+	<!-- 自定义BeanFactoryPostProcessor 在Bean实例化之前执行	-->
+	<bean id="myBeanFactoryPostProcessor" class="com.nchu.spring.beanfactroypostprocessor.MyBeanFactoryPostProcessor"></bean>
+	<!-- 可以自定义各个自定义BeanFactoryPostProcessor 执行顺序	-->
+	<bean id="myyBeanFactoryPostProcessorOrderd" class="com.nchu.spring.beanfactroypostprocessor.MyBeanFactoryPostProcessorOrderd"></bean>
+
+</beans>
